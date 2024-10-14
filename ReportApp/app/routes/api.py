@@ -12,13 +12,9 @@ async def get_server_status():
 @router.post("/reports", response_model=dict)
 async def generate_reports(request: Request):
     try:
-        print("function called")
-        request_body = await request.json()
-
-        # Debug log for the request body
-        print("Request received:", request_body)
-
-        return {"message": "Report generation successful"}
+        request_body =  request.json()
+        print(request_body,request)
+        return {"message": "Report generation successful",}
     except Exception as e:
         print("Error occurred:", str(e))
 
