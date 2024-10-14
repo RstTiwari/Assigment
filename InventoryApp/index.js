@@ -8,7 +8,9 @@ import http from "http";
 import fs from "fs";
 import { Server } from "socket.io";
 import cookieParser from "cookie-parser";
-import router from "./app/routes.js";
+import router from "./app/productRoutes.js";
+import productWatch from "./app/WatchStream/productWatch.js";
+import errorHandler from "./middleware/errorHandler.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -17,9 +19,8 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(cors());
 app.use(cookieParser());
 
-app.use("/app",router)
-
-
+app.use("/app", router);
+app.use(errorHandler)
 
 const Port = process.env.PORT || 5001;
 const DatabaseString = process.env.DatabaseString;
@@ -43,11 +44,10 @@ mongoose
 
         let io = new Server(backendServer, {
             cors: {
-                origin: "*", // frondt end origin
+                origin: "*",
                 methods: ["GET", "POST"],
             },
-            transports: ["websocket", "polling"], // Allow both WebSocket and polling
-            path:"/socket"
+            transports: ["websocket", "polling"],
         });
 
         backendServer.listen(Port, () => {
@@ -60,7 +60,7 @@ mongoose
             // ...
             console.log(
                 "socket connected with the client in  with socket id",
-                socket.id
+                socket.id,socket,
             );
             socket.on("message", (data) => {
                 console.log("received message from client", data);
@@ -71,8 +71,9 @@ mongoose
                 console.log(socket.id, "client disconnected");
             });
         });
+
+        productWatch(io);
     })
     .catch((e) => {
         console.log("Database connection failed" + e);
     });
-
