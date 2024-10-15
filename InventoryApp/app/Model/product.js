@@ -24,6 +24,11 @@ const productSchema = new mongoose.Schema(
         description: {
             type: String,
         },
+        unitsSold: {
+            type: Number,
+            default: 0, // Default to 0 initially
+            min: 0,
+        },
     },
     { timestamps: true }
 );

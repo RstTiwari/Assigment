@@ -10,13 +10,15 @@ load_dotenv()
 DatabaseString = os.getenv("DatabaseString")
 Port = int(os.getenv("Port", 8000))  # Default to 8000 if not set
 
+client = MongoClient(DatabaseString)
+database_name = os.getenv("DatabaseName", "ftms")  # Default to "ftms" if not set
+
 app = FastAPI()
+app.database = client[database_name]
 app.include_router(router)
 
 
 
-client = MongoClient(DatabaseString)
-app.database = client.get_default_database("ftms")
 
 if __name__ == "__main__":
     import uvicorn
